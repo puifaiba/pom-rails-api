@@ -10,10 +10,25 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_04_09_015738) do
+ActiveRecord::Schema.define(version: 2021_04_09_170948) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "intervals", force: :cascade do |t|
+    t.datetime "date"
+    t.integer "focus_duration"
+    t.integer "break_duration"
+    t.integer "long_break_duration"
+    t.string "category"
+    t.boolean "on_task"
+    t.string "diversion"
+    t.text "comment"
+    t.bigint "task_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["task_id"], name: "index_intervals_on_task_id"
+  end
 
   create_table "jwt_denylists", force: :cascade do |t|
     t.string "jti", null: false
@@ -21,6 +36,17 @@ ActiveRecord::Schema.define(version: 2021_04_09_015738) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["jti"], name: "index_jwt_denylists_on_jti"
+  end
+
+  create_table "tasks", force: :cascade do |t|
+    t.string "name"
+    t.text "description"
+    t.datetime "due_date"
+    t.string "status"
+    t.bigint "user_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_id"], name: "index_tasks_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -35,8 +61,11 @@ ActiveRecord::Schema.define(version: 2021_04_09_015738) do
     t.string "last_name"
     t.date "dob"
     t.integer "role"
+    t.integer "therapist_id"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "intervals", "tasks"
+  add_foreign_key "tasks", "users"
 end
